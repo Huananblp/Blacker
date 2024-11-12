@@ -39,7 +39,6 @@
       opacity: 0; 
     }
 
-
     /* สร้าง animation สำหรับฟองลอยขึ้น */
     @keyframes float {
       0% {
@@ -174,27 +173,123 @@
       background-color: #f44336;
       color: white;
     }
-    
+
     .info-box {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 10px;
-            padding: 55px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-bottom: 10px;
-            text-align: center;
-            height: auto;
-            max-height: 90vh; /* หรือขนาดอื่นๆ ที่ต้องการ */
-            overflow: auto; /* เพิ่ม scrollbar */
-        }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+      background-color: rgba(255, 255, 255, 0.7);
+      border-radius: 10px;
+      padding: 55px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 10px;
+      text-align: center;
+      height: auto;
+      max-height: 90vh; /* หรือขนาดอื่นๆ ที่ต้องการ */
+      overflow: auto; /* เพิ่ม scrollbar */
+    }
+
+    /* Overlay สำหรับเบลอพื้นหลัง */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.7); /* ทำให้ดูขาวๆ จางๆ */
+      backdrop-filter: blur(5px); /* เพิ่มความเบลอ */
+      z-index: 1000; /* ให้ overlay อยู่เหนือส่วนอื่นๆ */
+      display: none; /* ซ่อน overlay โดยเริ่มต้น */
+    }
+
+    /* ลบส่วน CSS เดิมที่เกี่ยวข้องกับแอนิเมชันเครื่องหมายถูก */
+    .success-animation {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 1001;
+    }
+
+    .checkmark {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      position: relative;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      animation: popUpSmooth 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    }
+
+    .checkmark::before {
+      content: '';
+      position: absolute;
+      width: 25px;
+      height: 50px;
+      border-width: 0 8px 8px 0;
+      border-style: solid;
+      border-color: white;
+      top: 30%;
+      left: 40%;
+      transform: translate(-50%, -50%) rotate(45deg) scale(0);
+      transform-origin: bottom left;
+      animation: drawCheckSmooth 0.6s ease-out 0.5s forwards;
+    }
+
+    @keyframes popUpSmooth {
+      0% {
+        transform: scale(0);
+      }
+      80% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes drawCheckSmooth {
+      0% {
+        transform: translate(-50%, -60%) rotate(45deg) scale(0);
+      }
+      100% {
+        transform: translate(-50%, -60%) rotate(45deg) scale(1);
+      }
+    }
+
+    .success-animation p {
+      font-size: 20px;
+      color: #4CAF50;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeInSmooth 0.5s ease-out 1s forwards;
+    }
+
+    @keyframes fadeInSmooth {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
+
 </head>
 <body>
-    <!-- สร้างฟอง 10 ฟอง -->
+  <!-- สร้างฟอง 10 ฟอง -->
   <div class="bubble"></div>
   <div class="bubble"></div>
   <div class="bubble"></div>
@@ -209,75 +304,87 @@
   <div class="header">    
   </div>
   <div class="info-box">
-  <img class="logo" src="https://www.huana-nbp.go.th/index/add_file/qOv0r0dTue83729.png" alt="โลโก้">
-  <h1>ปฏิบัติราชการอื่นๆ</h1>
-  <form id="myForm">
-    <label for="name">ชื่อ - สกุล:</label>
-    <input type="text" id="name" name="name" list="nameList" required autocomplete="off"> 
-    <datalist id="nameList"></datalist><br><br>
-    <label for="note">หมายเหตุ:</label>
-    <textarea id="note" name="note" required></textarea><br><br>
-    <button type="submit">ส่ง</button>
-  </form>
-</div>
+    <img class="logo" src="https://www.huana-nbp.go.th/index/add_file/qOv0r0dTue83729.png" alt="โลโก้">
+    <h1>ปฏิบัติราชการอื่นๆ</h1>
+    <form id="myForm">
+      <label for="name">ชื่อ - สกุล:</label>
+      <input type="text" id="name" name="name" list="nameList" required autocomplete="off"> 
+      <datalist id="nameList"></datalist><br><br>
+      <label for="note">หมายเหตุ:</label>
+      <textarea id="note" name="note" required></textarea><br><br>
+      <button type="submit">ส่ง</button>
+    </form>
+  </div>
+  <div id="overlay"></div>
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>กรุณารอซักครู่...</p>
+  </div>
+  <div id="message"></div>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <p>กรุณารอซักครู่...</p>
-</div>
-<div id="message"></div>
+  <!-- ป๊อปอัปแอนิเมชันเครื่องหมายถูก -->
+  <div id="successAnimation" class="success-animation">
+    <div class="checkmark">
+      <div class="checkmark-circle"></div>
+      <div class="checkmark-stem"></div>
+      <div class="checkmark-kick"></div>
+    </div>
+    <p>ส่งข้อมูลสำเร็จ!</p>
+  </div>
 
-<script>
-  var scripturl = 'https://script.google.com/macros/s/AKfycbxaQi3sx2uSHlfnDPBm876Tf_0fNdyvNLAFb6lbgvLZfdSSxWassdQYKZYTvlUIOF2-1Q/exec'; // เปลี่ยนเป็น URL ของคุณ!
-  var owner = 'องค์การบริหารส่วนตำบลหัวนา';
-  var message = document.getElementById('message'); // ประกาศตัวแปร message
+  <script>
+    var scripturl = 'https://script.google.com/macros/s/AKfycbxaQi3sx2uSHlfnDPBm876Tf_0fNdyvNLAFb6lbgvLZfdSSxWassdQYKZYTvlUIOF2-1Q/exec'; // เปลี่ยนเป็น URL ของคุณ!
+    var owner = 'องค์การบริหารส่วนตำบลหัวนา';
+    var message = document.getElementById('message'); // ประกาศตัวแปร message
 
-  $(document).ready(function () {
-    initApp();
-  });
+    $(document).ready(function () {
+      initApp();
+    });
 
-  function initApp() {
-    message.innerText = owner; // ใช้ message ที่ประกาศไว้
-    message.className = 'alert msgBg';
+    function initApp() {
+      message.innerText = owner; // ใช้ message ที่ประกาศไว้
+      message.className = 'alert msgBg';
 
-    $.ajax({
-      method: "POST",
-      url: scripturl,
-      data: { opt: 'getdata' },
-      success: function (dataPerson) {
-        if (Array.isArray(dataPerson)) {
-          $("#name").autocomplete({
-            maxShowItems: 3,
-            source: dataPerson
-          });
+      $.ajax({
+        method: "POST",
+        url: scripturl,
+        data: { opt: 'getdata' },
+        success: function (dataPerson) {
+          if (Array.isArray(dataPerson)) {
+            $("#name").autocomplete({
+              maxShowItems: 3,
+              source: dataPerson
+            });
 
-          var nameList = document.getElementById("nameList");
-          dataPerson.forEach(item => {
-            let option = document.createElement("option");
-            option.value = item;
-            option.text = item;
-            nameList.appendChild(option);
-          });
-        } else {
-          console.error("ข้อมูลรายชื่อพนักงานไม่ถูกต้อง:", dataPerson);
-          message.innerText = "เกิดข้อผิดพลาดในการโหลดรายชื่อพนักงาน"; // แสดงข้อความ error
+            var nameList = document.getElementById("nameList");
+            dataPerson.forEach(item => {
+              let option = document.createElement("option");
+              option.value = item;
+              option.text = item;
+              nameList.appendChild(option);
+            });
+          } else {
+            console.error("ข้อมูลรายชื่อพนักงานไม่ถูกต้อง:", dataPerson);
+            message.innerText = "เกิดข้อผิดพลาดในการโหลดรายชื่อพนักงาน"; // แสดงข้อความ error
+            message.className = 'alert error'; // เปลี่ยน class เป็น error
+            message.style.display = 'block';
+          }
+        },
+        error: function(error) {
+          console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+          message.innerText = "เกิดข้อผิดพลาดในการดึงข้อมูล"; // แสดงข้อความ error
           message.className = 'alert error'; // เปลี่ยน class เป็น error
           message.style.display = 'block';
         }
-      },
-      error: function(error) {
-        console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
-        message.innerText = "เกิดข้อผิดพลาดในการดึงข้อมูล"; // แสดงข้อความ error
-        message.className = 'alert error'; // เปลี่ยน class เป็น error
-        message.style.display = 'block';
-      }
-    });
-  }
-
+      });
+    }
     const form = document.getElementById('myForm');
     const loading = document.getElementById('loading');
+    const overlay = document.getElementById('overlay');
+    const successAnimation = document.getElementById('successAnimation');
 
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbw8KLaCOW9twm9TPGoMFyfxe4E8UP8v46oS1Lp46u5aIaAxpvkMFD3-WVw0mD5k0dMh8g/exec'; // เปลี่ยนเป็น URL ของคุณ! (อาจจะเหมือนกับ scripturl)
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbw8KLaCOW9twm9TPGoMFyfxe4E8UP8v46oS1Lp46u5aIaAxpvkMFD3-WVw0mD5k0dMh8g/exec'; // เปลี่ยนเป็น URL ของคุณ!
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       showLoading();
@@ -293,9 +400,8 @@
           const result = await response.json(); 
           hideLoading();
           if (result.success) {
-            showMessage('ส่งสำเร็จ', 'success');
+            showSuccessAnimation(); // แสดงแอนิเมชันเมื่อส่งข้อมูลสำเร็จ
             setTimeout(redirectToLiff, 1500);
-            redirectToLiff()
           } else {
             showMessage('ส่งไม่สำเร็จ', 'error');
           }
@@ -320,26 +426,47 @@
 
     function showLoading() {
       loading.style.display = 'block';
+      overlay.style.display = 'block'; // แสดง overlay
     }
 
     function hideLoading() {
       loading.style.display = 'none';
+      overlay.style.display = 'none'; // ซ่อน overlay
     }
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.classList.add(type);
-      message.style.display = 'block';
+    function showSuccessAnimation() {
+      overlay.style.display = 'block'; // แสดง overlay เบลอพื้นหลัง
+
+      // สร้างองค์ประกอบเครื่องหมายถูกแบบเด้ง
+      const successDiv = document.createElement('div');
+      successDiv.id = 'gsapSuccessAnimation';
+      successDiv.style.position = 'fixed';
+      successDiv.style.top = '50%';
+      successDiv.style.left = '50%';
+      successDiv.style.transform = 'translate(-50%, -50%)';
+      successDiv.style.textAlign = 'center';
+      successDiv.style.zIndex = '1001';
+      successDiv.innerHTML = `
+        <div style="width: 100px; height: 100px; border-radius: 50%; background-color: #4CAF50; display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 60%; height: 60%; fill: none; stroke: white; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round;">
+            <circle cx="26" cy="26" r="25" fill="none"></circle>
+            <path d="M14 27l7 7 16-16"></path>
+          </svg>
+        </div>
+        <p style="font-size: 20px; color: #4CAF50; margin-top: 20px; opacity: 0;">ส่งข้อมูลสำเร็จ!</p>
+      `;
+      document.body.appendChild(successDiv);
+
+      // แอนิเมชันด้วย GSAP
+      gsap.fromTo("#gsapSuccessAnimation", { scale: 0 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.75)" });
+      gsap.fromTo("#gsapSuccessAnimation p", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, delay: 0.5, ease: "power2.out" });
+
+      // ตั้งเวลาให้ป๊อปอัปซ่อนตัวเองหลังจาก 3 วินาที
       setTimeout(() => {
-        message.style.display = 'none';
-        message.classList.remove(type);
-      }, 3000); 
+        successDiv.remove();
+        overlay.style.display = 'none'; // ซ่อน overlay หลังจากซ่อนป๊อปอัป
+      }, 3000);
     }
-        // สุ่มตำแหน่งเริ่มต้นของฟองจากด้านซ้ายของหน้าจอ
-        const bubbles = document.querySelectorAll('.bubble');
-    bubbles.forEach(bubble => {
-      bubble.style.left = `${Math.random() * 100}%`; 
-    });
   </script>
 </body>
 </html>
